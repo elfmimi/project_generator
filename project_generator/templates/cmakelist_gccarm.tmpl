@@ -121,14 +121,16 @@ add_custom_command(OUTPUT "${OUTPUT_DIR}/{{name}}.hex" DEPENDS {{name}}
 add_custom_target({{name}}_binaries ALL DEPENDS {{name}} DEPENDS {{name}}_bin DEPENDS {{name}}_hex)
 
 {% if pre_build_script %}
-add_custom_target({{name}}_pre_build {% for command in pre_build_script %}
-        COMMAND {{command}}{% endfor %}
+add_custom_target({{name}}_pre_build {% for command in pre_build_script %}{% if command.endswith('.py') %}
+        COMMAND python {{command}}{% else %}
+        COMMAND {{command}}{% endif %}{% endfor %}
         WORKING_DIRECTORY ${BUILD_DIR})
 add_dependencies({{name}} {{name}}_pre_build)
 {% endif %}
 
 {% if post_build_script %}
-add_custom_command(TARGET {{name}}_binaries POST_BUILD{% for command in post_build_script %}
-        COMMAND {{command}}{% endfor %}
+add_custom_command(TARGET {{name}}_binaries POST_BUILD{% for command in post_build_script %}{% if command.endswith('.py') %}
+        COMMAND python {{command}}{% else %}
+        COMMAND {{command}}{% endif %}{% endfor %}
         WORKING_DIRECTORY ${BUILD_DIR})
 {% endif %}
